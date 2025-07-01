@@ -1,109 +1,31 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { h, ref, resolveComponent, watch } from 'vue'
+import { h, resolveComponent } from 'vue'
 
-interface Status {
-  id: number
-  name: string
-  color_hex?: string
-}
+import { usePrints } from '~/composables/usePrints'
 
-interface Print {
-  id: number
-  created_at: string
-  title: string
-  started_at: string | null
-  ended_at: string | null
-  status: Status // For display (joined)
-  status_id?: number // For insert
-}
-
-const client = useSupabaseClient()
-
-const { data: prints, refresh } = await useAsyncData<Print[]>('prints', async () => {
-  const { data, error } = await client
-    .from('prints')
-    .select(`
-      id,
-      created_at,
-      title,
-      started_at,
-      ended_at,
-      status:status (
-        id,
-        name,
-        color_hex
-      )
-    `)
-    .order('created_at', { ascending: false })
-  if (error)
-    throw error
-  return data ?? []
-})
-
-// SSR-safe status options fetch
-const { data: statusOptionsData } = await useAsyncData<Status[]>('statusOptions', async () => {
-  const { data } = await client.from('status').select('id, name, color_hex')
-  return data ?? []
-})
-const statusOptions = ref<Status[]>(statusOptionsData.value ?? [])
-
-// Form state
-const showForm = ref(false)
-const newTitle = ref('My Default Print')
-const newStatusId = ref<number | null>(null)
-
-// Reactively update statusOptions and set default status id
-watch(statusOptionsData, (val) => {
-  statusOptions.value = val ?? []
-  if (statusOptions.value.length > 0) {
-    newStatusId.value = statusOptions.value[0]!.id
-  }
-  else {
-    newStatusId.value = null
-  }
-}, { immediate: true })
-
-function openFormWithDefaults() {
-  newTitle.value = 'My Default Print'
-  newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : null
-  showForm.value = true
-}
-
-// Add print handler
-async function addPrint() {
-  if (!newTitle.value || !newStatusId.value)
-    return
-  const newPrint = {
-    title: newTitle.value,
-    started_at: new Date().toISOString(),
-    ended_at: null,
-    status: newStatusId.value, // Only send the status id
-  }
-  // @ts-expect-error: Supabase client is not typed, so insert expects never[]
-  await client.from('prints').insert([newPrint])
-  showForm.value = false
-  newTitle.value = 'My Default Print'
-  newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : null
-  await refresh()
-}
+const {
+  prints,
+  statusOptions,
+  showForm,
+  newTitle,
+  newStatusId,
+  stlFile,
+  openFormWithDefaults,
+  handleStlFileChange,
+  addPrint,
+  deletePrint,
+  updatePrintStatus,
+  downloadStl,
+} = usePrints()
 
 const NuxtBadge = resolveComponent('NuxtBadge')
 const NuxtButton = resolveComponent('NuxtButton')
 const NuxtDropdownMenu = resolveComponent('NuxtDropdownMenu')
+const NuxtModal = resolveComponent('NuxtModal')
+const NuxtInput = resolveComponent('NuxtInput')
 
-async function deletePrint(printId: number) {
-  await client.from('prints').delete().eq('id', printId)
-  await refresh()
-}
-
-async function updatePrintStatus(printId: number, statusId: number) {
-  // @ts-expect-error: Supabase client is not typed, so update expects never
-  await client.from('prints').update({ status: statusId }).eq('id', printId)
-  await refresh()
-}
-
-const columns: TableColumn<Print>[] = [
+const columns: TableColumn<any>[] = [
   {
     accessorKey: 'id',
     header: '#',
@@ -156,6 +78,12 @@ const columns: TableColumn<Print>[] = [
           'items': [
             { label: 'Delete', icon: 'i-lucide-trash', color: 'error', onSelect: () => deletePrint(row.original.id) },
             { type: 'separator' },
+            {
+              label: 'Download STL',
+              icon: 'i-lucide-download',
+              onSelect: () => downloadStl(row.original.stl_url),
+            },
+            { type: 'separator' },
             ...statusOptions.value.map(status => ({
               label: `Set status: ${status.name}`,
               icon: 'i-lucide-check-circle',
@@ -180,28 +108,47 @@ const columns: TableColumn<Print>[] = [
 
 <template>
   <div>
-    <h1>Prints</h1>
-    <NuxtButton color="secondary" class="mb-4" @click="openFormWithDefaults">
-      Add Print
-    </NuxtButton>
-
-    <div v-if="showForm" class="mb-4">
-      <NuxtInput v-model="newTitle" placeholder="Title" class="mb-2" />
-      <select v-model="newStatusId" class="mb-2">
-        <option disabled value="">
-          Select Status
-        </option>
-        <option v-for="status in statusOptions" :key="status.id" :value="status.id">
-          {{ status.name }}
-        </option>
-      </select>
-      <NuxtButton color="success" @click="addPrint">
-        Save
-      </NuxtButton>
-      <NuxtButton color="secondary" variant="ghost" @click="showForm = false">
-        Cancel
+    <div class="flex justify-between items-center">
+      <h1>Prints</h1>
+      <NuxtButton color="secondary" class="mb-4" @click="openFormWithDefaults">
+        Add Print
       </NuxtButton>
     </div>
+
+    <NuxtModal v-model:open="showForm" title="Add Print" description="Fill in the details for the new print.">
+      <template #body>
+        <NuxtInput v-model="newTitle" placeholder="Title" class="mb-2" required />
+        <select v-model="newStatusId" class="mb-2" required>
+          <option disabled value="">
+            Select Status
+          </option>
+          <option v-for="status in statusOptions" :key="status.id" :value="status.id">
+            {{ status.name }}
+          </option>
+        </select>
+        <div class="mb-2">
+          <label class="block mb-1 font-medium">STL File <span class="text-error">*</span></label>
+          <NuxtInput
+            type="file"
+            accept=".stl"
+            class="w-full"
+            required
+            @change="handleStlFileChange"
+          />
+          <div v-if="stlFile" class="text-xs mt-1 text-muted">
+            Selected: {{ stlFile.name }}
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <NuxtButton color="success" @click="addPrint">
+          Save
+        </NuxtButton>
+        <NuxtButton color="secondary" variant="ghost" @click="showForm = false">
+          Cancel
+        </NuxtButton>
+      </template>
+    </NuxtModal>
 
     <ClientOnly>
       <!-- TODO: currently there is an hydration issue -->
