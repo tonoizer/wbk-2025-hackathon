@@ -24,6 +24,7 @@ const NuxtButton = resolveComponent('NuxtButton')
 const NuxtDropdownMenu = resolveComponent('NuxtDropdownMenu')
 const NuxtModal = resolveComponent('NuxtModal')
 const NuxtInput = resolveComponent('NuxtInput')
+const NuxtSelect = resolveComponent('NuxtSelect')
 
 const columns: TableColumn<any>[] = [
   {
@@ -117,36 +118,60 @@ const columns: TableColumn<any>[] = [
 
     <NuxtModal v-model:open="showForm" title="Add Print" description="Fill in the details for the new print.">
       <template #body>
-        <NuxtInput v-model="newTitle" placeholder="Title" class="mb-2" required />
-        <select v-model="newStatusId" class="mb-2" required>
-          <option disabled value="">
-            Select Status
-          </option>
-          <option v-for="status in statusOptions" :key="status.id" :value="status.id">
-            {{ status.name }}
-          </option>
-        </select>
-        <div class="mb-2">
-          <label class="block mb-1 font-medium">STL File <span class="text-error">*</span></label>
-          <NuxtInput
-            type="file"
-            accept=".stl"
-            class="w-full"
-            required
-            @change="handleStlFileChange"
-          />
-          <div v-if="stlFile" class="text-xs mt-1 text-muted">
-            Selected: {{ stlFile.name }}
+        <form class="space-y-5" @submit.prevent="addPrint">
+          <div>
+            <label class="block mb-1 font-medium">Title <span class="text-error">*</span></label>
+            <NuxtInput v-model="newTitle" placeholder="Title" required class="w-full" />
           </div>
-        </div>
+          <div>
+            <label class="block mb-1 font-medium">Status <span class="text-error">*</span></label>
+            <NuxtSelect
+              v-model="newStatusId"
+              :items="statusOptions"
+              value-key="id"
+              label-key="name"
+              placeholder="Select Status"
+              class="w-full"
+              required
+            >
+              <template #item="{ item }">
+                <span class="flex items-center gap-2">
+                  <span v-if="item.color_hex" :style="{ backgroundColor: item.color_hex }" class="inline-block w-3 h-3 rounded-full" />
+                  <span>{{ item.name }}</span>
+                </span>
+              </template>
+              <template #selected="{ item }">
+                <span class="flex items-center gap-2">
+                  <span v-if="item.color_hex" :style="{ backgroundColor: item.color_hex }" class="inline-block w-3 h-3 rounded-full" />
+                  <span>{{ item.name }}</span>
+                </span>
+              </template>
+            </NuxtSelect>
+          </div>
+          <div>
+            <label class="block mb-1 font-medium">STL File <span class="text-error">*</span></label>
+            <NuxtInput
+              type="file"
+              accept=".stl"
+              class="w-full"
+              required
+              @change="handleStlFileChange"
+            />
+            <div v-if="stlFile" class="text-xs mt-1 text-primary font-mono">
+              Selected: {{ stlFile.name }}
+            </div>
+          </div>
+        </form>
       </template>
       <template #footer>
-        <NuxtButton color="success" @click="addPrint">
-          Save
-        </NuxtButton>
-        <NuxtButton color="secondary" variant="ghost" @click="showForm = false">
-          Cancel
-        </NuxtButton>
+        <div class="flex justify-end gap-2">
+          <NuxtButton color="secondary" :disabled="!newTitle || !newStatusId || !stlFile" @click="addPrint">
+            Save
+          </NuxtButton>
+          <NuxtButton color="secondary" variant="ghost" @click="showForm = false">
+            Cancel
+          </NuxtButton>
+        </div>
       </template>
     </NuxtModal>
 
