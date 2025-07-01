@@ -102,8 +102,8 @@ export default defineNuxtConfig({
     },
     prerender: {
       crawlLinks: false,
-      routes: ['/', '/photos', '/about', '/blogs'],
-      ignore: ['/hi'],
+      routes: ['/'],
+      ignore: [],
     },
   },
 
@@ -131,7 +131,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      include: ['/dashboard'], // Only guard /dashboard
+      include: ['/dashboard', '/prints'], // Only guard /dashboard
       // exclude: [],
     },
   },
