@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { h, resolveComponent } from 'vue'
+import { h, ref, resolveComponent } from 'vue'
 
 import { usePrints } from '~/composables/usePrints'
 
@@ -26,19 +26,43 @@ const NuxtModal = resolveComponent('NuxtModal')
 const NuxtInput = resolveComponent('NuxtInput')
 const NuxtSelect = resolveComponent('NuxtSelect')
 
+const sorting = ref([
+  { id: 'id', desc: false },
+])
+
+function getHeader(column: any, label: string) {
+  const isSorted = column.getIsSorted && column.getIsSorted()
+  return h(
+    NuxtButton,
+    {
+      'color': 'neutral',
+      'variant': 'ghost',
+      label,
+      'icon': isSorted
+        ? isSorted === 'asc'
+          ? 'i-lucide-arrow-up-narrow-wide'
+          : 'i-lucide-arrow-down-wide-narrow'
+        : 'i-lucide-arrow-up-down',
+      'class': '-mx-2.5',
+      'onClick': () => column.toggleSorting && column.toggleSorting(isSorted === 'asc'),
+      'aria-label': `Sort by ${label}`,
+    },
+  )
+}
+
 const columns: TableColumn<any>[] = [
   {
     accessorKey: 'id',
-    header: '#',
+    header: ({ column }) => getHeader(column, '#'),
     cell: ({ row }) => `#${row.getValue('id')}`,
   },
   {
     accessorKey: 'title',
-    header: 'Title',
+    header: ({ column }) => getHeader(column, 'Title'),
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => getHeader(column, 'Status'),
     cell: ({ row }) => {
       const status = row.original.status
       const color = status?.color_hex || 'neutral'
@@ -47,7 +71,7 @@ const columns: TableColumn<any>[] = [
   },
   {
     accessorKey: 'started_at',
-    header: 'Started',
+    header: ({ column }) => getHeader(column, 'Started'),
     cell: ({ row }) => {
       const value = row.getValue('started_at')
       return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
@@ -55,7 +79,7 @@ const columns: TableColumn<any>[] = [
   },
   {
     accessorKey: 'ended_at',
-    header: 'Ended',
+    header: ({ column }) => getHeader(column, 'Ended'),
     cell: ({ row }) => {
       const value = row.getValue('ended_at')
       return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
@@ -63,7 +87,7 @@ const columns: TableColumn<any>[] = [
   },
   {
     accessorKey: 'created_at',
-    header: 'Created',
+    header: ({ column }) => getHeader(column, 'Created'),
     cell: ({ row }) => {
       const value = row.getValue('created_at')
       return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
@@ -177,7 +201,7 @@ const columns: TableColumn<any>[] = [
 
     <ClientOnly>
       <!-- TODO: currently there is an hydration issue -->
-      <NuxtTable :data="prints ?? []" :columns="columns" class="flex-1" />
+      <NuxtTable v-model:sorting="sorting" :data="prints ?? []" :columns="columns" class="flex-1" />
     </ClientOnly>
   </div>
 </template>
