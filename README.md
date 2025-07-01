@@ -8,23 +8,15 @@ pnpm dev
 
 ## Supabase
 
-Create a `.env.local` file in the root directory and add the following variables:
+Create a `.env` file in the root directory and add the following variables:
 
 ```
 SUPABASE_URL=https://beierthon.klzdev.com
-SUPABASE_KEY=<your-key>
+SUPABASE_KEY=<your-supabase-key>
 
 NUXT_PUBLIC_SUPABASE_URL=https://beierthon.klzdev.com
-NUXT_PUBLIC_SUPABASE_KEY=<your-key>
+NUXT_PUBLIC_SUPABASE_KEY=<your-supabase-key>
 ```
-
-and also add the key to the existing `.env` file:
-
-```
-SUPABASE_KEY=<your-key>
-NUXT_PUBLIC_SUPABASE_KEY=<your-key>
-```
-
 
 # Troubleshooting
 
