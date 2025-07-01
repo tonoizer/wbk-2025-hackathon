@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const supabase = useSupabaseClient()
 const email = ref('')
 const loading = ref(false)
 const message = ref('')
 const touched = ref(false)
+const router = useRouter()
+
+const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 const emailPattern = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/
 const emailError = computed(() => {
@@ -28,7 +32,7 @@ async function signInWithOtp() {
   const { error } = await supabase.auth.signInWithOtp({
     email: email.value,
     options: {
-      emailRedirectTo: `${window.location.origin}/confirm`,
+      emailRedirectTo: `${siteUrl}/confirm`,
     },
   })
   loading.value = false
@@ -39,6 +43,22 @@ async function signInWithOtp() {
     message.value = 'Check your email for the login link.'
   }
 }
+
+onMounted(async () => {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error) {
+      console.error('Supabase getUser error:', error)
+      return
+    }
+    if (user) {
+      router.replace('/dashboard')
+    }
+  }
+  catch (err) {
+    console.error('Unexpected error in login redirect:', err)
+  }
+})
 </script>
 
 <template>
@@ -51,26 +71,28 @@ async function signInWithOtp() {
         </h1>
       </template>
       <div class="flex flex-col items-center gap-4">
-        <p class="text-base text-gray-600 dark:text-gray-300 mb-2">
-          Enter your email to receive a magic login link.
-        </p>
-        <form class="flex flex-col gap-4 w-full" novalidate @submit.prevent="signInWithOtp">
-          <NuxtInput
-            v-model="email"
-            type="email"
-            placeholder="Your email"
-            required
-            :disabled="loading"
-            autofocus
-            size="xl"
-            :error="!!emailError"
-            :error-message="emailError"
-            @blur="touched = true"
-          />
-          <NuxtButton :loading="loading" type="submit" block size="xl" color="secondary" :disabled="!isEmailValid || loading">
-            Sign In with Email
-          </NuxtButton>
-        </form>
+        <template v-if="message !== 'Check your email for the login link.'">
+          <p class="text-base text-gray-600 dark:text-gray-300 mb-2">
+            Enter your email to receive a magic login link.
+          </p>
+          <form class="flex flex-col gap-4 w-full" novalidate @submit.prevent="signInWithOtp">
+            <NuxtInput
+              v-model="email"
+              type="email"
+              placeholder="Your email"
+              required
+              :disabled="loading"
+              autofocus
+              size="xl"
+              :error="!!emailError"
+              :error-message="emailError"
+              @blur="touched = true"
+            />
+            <NuxtButton :loading="loading" type="submit" block size="xl" color="secondary" :disabled="!isEmailValid || loading">
+              Sign In with Email
+            </NuxtButton>
+          </form>
+        </template>
         <p v-if="message" class="mt-4 text-center">
           {{ message }}
         </p>
