@@ -131,7 +131,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/login',
       callback: '/confirm',
-      include: ['/dashboard', '/prints'], // Only guard /dashboard
+      include: ['/dashboard'], // Only guard /dashboard
       // exclude: [],
     },
   },
