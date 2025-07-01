@@ -16,9 +16,6 @@ SUPABASE_KEY=<your-supabase-key>
 
 NUXT_PUBLIC_SUPABASE_URL=https://beierthon.klzdev.com
 NUXT_PUBLIC_SUPABASE_KEY=<your-supabase-key>
-
-# This is the URL of the site, used for email redirects for development only
-NUXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ## Deployment
