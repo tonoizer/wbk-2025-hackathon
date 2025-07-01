@@ -21,7 +21,7 @@ export const socialItemsWithOutLabel = [
   },
   {
     icon: 'i-simple-icons-github',
-    to: 'https://github.com/BeierKevin/Beierthon',
+    to: 'https://github.com/BeierKevin/KIT-Hackathon',
     target: '_blank',
   },
 ]
@@ -36,7 +36,7 @@ export const socialItemsWithLabel = [
   {
     label: 'GitHub',
     icon: 'i-simple-icons-github',
-    to: 'https://github.com/BeierKevin/Beierthon',
+    to: 'https://github.com/BeierKevin/KIT-Hackathon',
     target: '_blank',
   },
 ]
