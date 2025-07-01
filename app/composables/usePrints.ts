@@ -58,7 +58,7 @@ export function usePrints() {
   // Form state
   const showForm = ref(false)
   const newTitle = ref('My Default Print')
-  const newStatusId = ref<number | null>(null)
+  const newStatusId = ref<number | undefined>(undefined)
   const stlFile = ref<File | null>(null)
 
   // Reactively update statusOptions and set default status id
@@ -68,13 +68,13 @@ export function usePrints() {
       newStatusId.value = statusOptions.value[0]!.id
     }
     else {
-      newStatusId.value = null
+      newStatusId.value = undefined
     }
   }, { immediate: true })
 
   function openFormWithDefaults() {
     newTitle.value = 'My Default Print'
-    newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : null
+    newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : undefined
     showForm.value = true
   }
 
@@ -137,8 +137,8 @@ export function usePrints() {
       color: 'success',
     })
     showForm.value = false
-    newTitle.value = 'My Default Print'
-    newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : null
+    newTitle.value = 'Print'
+    newStatusId.value = (statusOptions.value || []).length > 0 ? statusOptions.value[0]!.id : undefined
     stlFile.value = null
     await refresh()
   }
