@@ -10,7 +10,6 @@ const {
   statusOptions,
   showForm,
   newTitle,
-  newStatusId,
   stlFile,
   openFormWithDefaults,
   handleStlFileChange,
@@ -25,7 +24,6 @@ const NuxtButton = resolveComponent('NuxtButton')
 const NuxtDropdownMenu = resolveComponent('NuxtDropdownMenu')
 const NuxtModal = resolveComponent('NuxtModal')
 const NuxtInput = resolveComponent('NuxtInput')
-const NuxtSelect = resolveComponent('NuxtSelect')
 
 const sorting = ref([
   { id: 'id', desc: false },
@@ -188,31 +186,6 @@ defineOgImageComponent('Default')
             <NuxtInput v-model="newTitle" placeholder="Title" required class="w-full" />
           </div>
           <div>
-            <label class="block mb-1 font-medium">Status <span class="text-error">*</span></label>
-            <NuxtSelect
-              v-model="newStatusId"
-              :items="statusOptions"
-              value-key="id"
-              label-key="name"
-              placeholder="Select Status"
-              class="w-full"
-              required
-            >
-              <template #item="{ item }">
-                <span class="flex items-center gap-2">
-                  <span v-if="item.color_hex" :style="{ backgroundColor: item.color_hex }" class="inline-block w-3 h-3 rounded-full" />
-                  <span>{{ item.name }}</span>
-                </span>
-              </template>
-              <template #selected="{ item }">
-                <span class="flex items-center gap-2">
-                  <span v-if="item.color_hex" :style="{ backgroundColor: item.color_hex }" class="inline-block w-3 h-3 rounded-full" />
-                  <span>{{ item.name }}</span>
-                </span>
-              </template>
-            </NuxtSelect>
-          </div>
-          <div>
             <label class="block mb-1 font-medium">STL File <span class="text-error">*</span></label>
             <NuxtInput
               type="file"
@@ -229,7 +202,7 @@ defineOgImageComponent('Default')
       </template>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <NuxtButton color="secondary" :disabled="!newTitle || !newStatusId || !stlFile" @click="addPrint">
+          <NuxtButton color="secondary" :disabled="!newTitle || !stlFile" @click="addPrint">
             Save
           </NuxtButton>
           <NuxtButton color="secondary" variant="ghost" @click="showForm = false">

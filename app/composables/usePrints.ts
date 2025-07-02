@@ -19,6 +19,13 @@ interface Print {
   status: Status
   status_id?: number
   stl_url?: string
+  quality?: number
+  quality_status?: QualityStatus
+}
+
+interface QualityStatus {
+  id: number
+  type: string
 }
 
 export function usePrints() {
@@ -110,7 +117,7 @@ export function usePrints() {
   }
 
   async function addPrint() {
-    if (!newTitle.value || !newStatusId.value || !stlFile.value) {
+    if (!newTitle.value || !stlFile.value) {
       toast.add({
         title: 'Missing Fields',
         description: 'Please fill in all fields and select an STL file.',
@@ -140,7 +147,6 @@ export function usePrints() {
       title: newTitle.value,
       started_at: new Date().toISOString(),
       ended_at: null,
-      status: newStatusId.value,
       stl_url,
     }
     const { error } = await insertToSupabaseTable('prints', newPrint)
