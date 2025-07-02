@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{ title?: string, description?: string, headline?: string }>(), {
   title: 'title',
   description: 'description',
-  headline: 'portfolio',
+  headline: 'hackathon',
 })
 
 const title = computed(() => props.title.slice(0, 60))

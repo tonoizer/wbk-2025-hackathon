@@ -2,6 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { appName, appUrl } from '~/config/site'
+
 const supabase = useSupabaseClient()
 const email = ref('')
 const loading = ref(false)
@@ -59,6 +61,45 @@ onMounted(async () => {
     console.error('Unexpected error in login redirect:', err)
   }
 })
+
+useHead({
+  htmlAttrs: {
+    lang: 'en',
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/logo.svg',
+    },
+    {
+      rel: 'canonical',
+      href: `${appUrl}/login`,
+    },
+  ],
+})
+
+useSeoMeta({
+  title: `${appName} Hackathon - Login`,
+  description: 'Sign in to your Hackathon account to access the dashboard and manage your 3D prints.',
+  ogTitle: `${appName} Hackathon - Login`,
+  ogDescription: 'Sign in to your Hackathon account to access the dashboard and manage your 3D prints.',
+  ogImage: `${appUrl}/__og-image__/static/og-login.png`,
+  ogImageAlt: 'A preview image for the Login page of the Hackathon event website.',
+  ogUrl: `${appUrl}/login`,
+  ogType: 'website',
+  ogSiteName: `${appName} Hackathon`,
+  ogLocale: 'en_US',
+  // Twitter-specific tags
+  twitterCard: 'summary_large_image',
+  twitterTitle: `${appName} Hackathon - Login`,
+  twitterDescription: 'Sign in to your Hackathon account to access the dashboard and manage your 3D prints.',
+  twitterImage: `${appUrl}/__og-image__/static/og-login.png`,
+  twitterImageAlt: 'A preview image for the Login page of the Hackathon event website.',
+})
+
+// OG Images: https://github.com/nuxt-modules/og-image/tree/main/src/runtime/app/components/Templates/Community
+defineOgImageComponent('Default')
 </script>
 
 <template>
