@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import { h, ref, resolveComponent } from 'vue'
 
 import { usePrints } from '~/composables/usePrints'
+import { appName, appUrl } from '~/config/site'
 
 const {
   prints,
@@ -129,6 +130,45 @@ const columns: TableColumn<any>[] = [
       ),
   },
 ]
+
+useHead({
+  htmlAttrs: {
+    lang: 'en',
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/logo.svg',
+    },
+    {
+      rel: 'canonical',
+      href: `${appUrl}/dashboard`,
+    },
+  ],
+})
+
+useSeoMeta({
+  title: `${appName} Hackathon - Dashboard`,
+  description: 'View and manage your 3D prints and their statuses on the Hackathon dashboard.',
+  ogTitle: `${appName} Hackathon - Dashboard`,
+  ogDescription: 'View and manage your 3D prints and their statuses on the Hackathon dashboard.',
+  ogImage: `${appUrl}/__og-image__/static/og-dashboard.png`,
+  ogImageAlt: 'A preview image for the Dashboard page of the Hackathon event website.',
+  ogUrl: `${appUrl}/dashboard`,
+  ogType: 'website',
+  ogSiteName: `${appName} Hackathon`,
+  ogLocale: 'en_US',
+  // Twitter-specific tags
+  twitterCard: 'summary_large_image',
+  twitterTitle: `${appName} Hackathon - Dashboard`,
+  twitterDescription: 'View and manage your 3D prints and their statuses on the Hackathon dashboard.',
+  twitterImage: `${appUrl}/__og-image__/static/og-dashboard.png`,
+  twitterImageAlt: 'A preview image for the Dashboard page of the Hackathon event website.',
+})
+
+// OG Images: https://github.com/nuxt-modules/og-image/tree/main/src/runtime/app/components/Templates/Community
+defineOgImageComponent('Default')
 </script>
 
 <template>
