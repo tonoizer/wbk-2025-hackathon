@@ -66,7 +66,7 @@ defineOgImageComponent('Default')
           </template>
 
           <p>
-            <strong class="opacity-50">Name:</strong> Stephan M. C. Wolf, Kevin Beier, ....
+            <strong class="opacity-50">Name:</strong> Konrad Lorenz, Stephan M. C. Wolf, Kevin Beier, Matyas K. Somogyi, Jonas Kreuziger
           </p>
           <p>
             <strong class="opacity-50">E-Mail:</strong> <NuxtLink href="mailto:hackathon@kevinbeier.com" class="underline">
