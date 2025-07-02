@@ -93,6 +93,34 @@ to authenticated
 using (bucket_id = 'stl-bucket');
 ```
 
+## Row Level Security (RLS) Policies
+
+### print_quality_status Table
+
+To allow your application to join and read from the `print_quality_status` table, you must enable Row Level Security (RLS) and add a policy that allows SELECT access for authenticated users.
+
+**SQL Example:**
+```sql
+ALTER TABLE print_quality_status ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow authenticated read"
+  ON print_quality_status
+  FOR SELECT
+  TO authenticated
+  USING (true);
+```
+
+**Supabase UI Steps:**
+1. Go to the `print_quality_status` table in the dashboard.
+2. Click on the "Policies" tab.
+3. Click "Create policy".
+4. Name: Allow authenticated read
+5. Action: SELECT
+6. Apply to roles: authenticated
+7. Using expression: `true`
+8. Save and enable the policy.
+
+This policy is required for your app to fetch the quality type for each print via a foreign key join.
+
 ---
 
 **Without these policies, file upload and download will not work!**
