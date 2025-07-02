@@ -1,4 +1,4 @@
-# KIT Hackathon
+# WBK 2025 Hackathon
 
 ## Run the project
 
