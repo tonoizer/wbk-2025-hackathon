@@ -1,5 +1,5 @@
 import { useAsyncData, useSupabaseClient, useToast } from '#imports'
-import { ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { insertToSupabaseTable } from '~/composables/useSupabaseInsert'
 import { uploadToSupabaseBucket } from '~/composables/useSupabaseUpload'
@@ -60,6 +60,27 @@ export function usePrints() {
   const newTitle = ref('My Default Print')
   const newStatusId = ref<number | undefined>(undefined)
   const stlFile = ref<File | null>(null)
+
+  let subscription: any = null
+
+  onMounted(() => {
+    subscription = client
+      .channel('public:prints')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'prints' },
+        async () => {
+          await refresh()
+        },
+      )
+      .subscribe()
+  })
+
+  onUnmounted(() => {
+    if (subscription) {
+      client.removeChannel(subscription)
+    }
+  })
 
   // Reactively update statusOptions and set default status id
   watch(statusOptionsData, (val) => {
