@@ -7,7 +7,7 @@ import { uploadToSupabaseBucket } from '~/composables/useSupabaseUpload'
 interface Status {
   id: number
   name: string
-  color_hex?: string
+  color: string
 }
 
 interface Print {
@@ -45,9 +45,14 @@ export function usePrints() {
         status:status (
           id,
           name,
-          color_hex
+          color
         ),
-        stl_url
+        stl_url,
+        quality_status:quality (
+          id,
+          type,
+          color
+        )
       `)
       .order('created_at', { ascending: false })
     if (error)
@@ -57,7 +62,7 @@ export function usePrints() {
 
   // Fetch status options
   const { data: statusOptionsData } = useAsyncData<Status[]>('statusOptions', async () => {
-    const { data } = await client.from('status').select('id, name, color_hex')
+    const { data } = await client.from('status').select('id, name, color')
     return data ?? []
   })
   const statusOptions = ref<Status[]>(statusOptionsData.value ?? [])

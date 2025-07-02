@@ -64,8 +64,18 @@ const columns: TableColumn<any>[] = [
     header: ({ column }) => getHeader(column, 'Status'),
     cell: ({ row }) => {
       const status = row.original.status
-      const color = status?.color_hex || 'neutral'
+      const color = status?.color || 'neutral'
       return h(NuxtBadge, { class: 'capitalize', variant: 'subtle', color }, () => status?.name)
+    },
+  },
+  {
+    accessorKey: 'quality_status',
+    header: ({ column }) => getHeader(column, 'Quality'),
+    cell: ({ row }) => {
+      const quality = row.original.quality_status
+      const qualityType = quality?.type || '-'
+      const color = row.original.quality_status?.color || 'neutral'
+      return h(NuxtBadge, { class: 'capitalize', variant: 'subtle', color }, () => qualityType)
     },
   },
   {
