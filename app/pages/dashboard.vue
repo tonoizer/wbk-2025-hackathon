@@ -4,6 +4,7 @@ import { h, ref, resolveComponent } from 'vue'
 
 import { usePrints } from '~/composables/usePrints'
 import { appName, appUrl } from '~/config/site'
+import { formatDateEU } from '~/utils/formatDate'
 
 const {
   prints,
@@ -82,24 +83,24 @@ const columns: TableColumn<any>[] = [
     accessorKey: 'started_at',
     header: ({ column }) => getHeader(column, 'Started'),
     cell: ({ row }) => {
-      const value = row.getValue('started_at')
-      return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
+      const value = row.getValue('started_at') as string | null | undefined
+      return formatDateEU(value)
     },
   },
   {
     accessorKey: 'ended_at',
     header: ({ column }) => getHeader(column, 'Ended'),
     cell: ({ row }) => {
-      const value = row.getValue('ended_at')
-      return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
+      const value = row.getValue('ended_at') as string | null | undefined
+      return formatDateEU(value)
     },
   },
   {
     accessorKey: 'created_at',
     header: ({ column }) => getHeader(column, 'Created'),
     cell: ({ row }) => {
-      const value = row.getValue('created_at')
-      return typeof value === 'string' ? value.replace('T', ' ').substring(0, 19) : '-'
+      const value = row.getValue('created_at') as string | null | undefined
+      return formatDateEU(value)
     },
   },
   {
